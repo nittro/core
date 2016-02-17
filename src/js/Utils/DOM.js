@@ -32,7 +32,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     };
 
     var getElem = function (elem) {
-        Arrays.isArray(elem) && (elem = elem[0]);
+        Arrays.isArrayLike(elem) && (elem = elem[0]);
         return typeof elem === 'string' ? DOM.getById(elem) : elem;
 
     };
@@ -76,7 +76,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         getChildren: function (elem) {
-            return Arrays.createFrom(elem.childNodes).filter(function (node) {
+            return Arrays.createFrom(elem.childNodes || '').filter(function (node) {
                 return node.nodeType === 1;
 
             });
