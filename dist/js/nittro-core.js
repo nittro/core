@@ -1945,7 +1945,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     };
 
     var getElem = function (elem) {
-        Arrays.isArray(elem) && (elem = elem[0]);
+        Arrays.isArrayLike(elem) && (elem = elem[0]);
         return typeof elem === 'string' ? DOM.getById(elem) : elem;
 
     };
@@ -1977,9 +1977,21 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
     };
 
+    var parseData = function (value) {
+        if (!value) return null;
+
+        try {
+            return JSON.parse(value);
+
+        } catch (e) {
+            return value;
+
+        }
+    };
+
     var DOM = {
-        getByClassName: function (className) {
-            return Arrays.createFrom(document.getElementsByClassName(className));
+        getByClassName: function (className, context) {
+            return Arrays.createFrom((context || document).getElementsByClassName(className));
 
         },
 
@@ -1988,8 +2000,42 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
         },
 
+        find: function (sel, context) {
+            var elems = [];
+            sel = sel.trim().split(/\s*,\s*/g);
+
+            sel.forEach(function (s) {
+                var m = s.match(/^#([^\s\[>+:\.]+)\s+\.([^\s\[>+:]+)$/);
+
+                if (m) {
+                    elems.push.apply(elems, DOM.getByClassName(m[2], DOM.getById(m[1])));
+                    return;
+
+                } else if (s.match(/^[^.#]|[\s\[>+:]/)) {
+                    throw new TypeError('Invalid selector "' + s + '", only single-level .class and #id or "#id .class" are allowed');
+
+                }
+
+                if (s.charAt(0) === '#') {
+                    m = DOM.getById(s.substr(1));
+
+                    if (m) {
+                        elems.push(m);
+
+                    }
+                } else {
+                    m = DOM.getByClassName(s.substr(1), context);
+                    elems.push.apply(elems, m);
+
+                }
+            });
+
+            return elems;
+
+        },
+
         getChildren: function (elem) {
-            return Arrays.createFrom(elem.childNodes).filter(function (node) {
+            return Arrays.createFrom(elem.childNodes || '').filter(function (node) {
                 return node.nodeType === 1;
 
             });
@@ -2110,81 +2156,49 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             });
         },
 
-        contains: null,
-        addListener: null,
-        removeListener: null,
-        addClass: null,
-        removeClass: null,
-        toggleClass: null,
-        hasClass: null,
-        getData: null,
-        setData: null
-    };
-
-
-
-    var rnative = /^[^{]+\{\s*\[native \w/;
-
-    if (rnative.test(document.documentElement.compareDocumentPosition) || rnative.test(document.documentElement.contains)) {
-        DOM.contains = function( a, b ) {
+        contains: function( a, b ) {
             var adown = a.nodeType === 9 ? a.documentElement : a,
                 bup = b && b.parentNode;
+
             return a === bup || !!( bup && bup.nodeType === 1 && (
                     adown.contains
                         ? adown.contains( bup )
                         : a.compareDocumentPosition && a.compareDocumentPosition( bup ) & 16
                 ));
-        };
-    } else {
-        DOM.contains = function( a, b ) {
-            if ( b ) {
-                while ( (b = b.parentNode) ) {
-                    if ( b === a ) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        };
-    }
+        },
 
-
-    if ('addEventListener' in document) {
-        DOM.addListener = function (elem, evt, listener) {
+        addListener: function (elem, evt, listener) {
             return map(arguments, function (elem, evt, listener) {
                 elem.addEventListener(evt, listener, false);
                 return elem;
 
             });
-        };
-
-        DOM.removeListener = function (elem, evt, listener) {
+        },
+        removeListener: function (elem, evt, listener) {
             return map(arguments, function (elem, evt, listener) {
                 elem.removeEventListener(evt, listener, false);
                 return elem;
 
             });
-        };
-    } else if ('attachEvent' in document) {
-        DOM.addListener = function (elem, evt, listener) {
-            return map(arguments, function (elem, evt, listener) {
-                elem.attachEvent('on' + evt, listener);
+        },
+
+        getData: function (elem, key) {
+            return parseData(getElem(elem).getAttribute('data-' + key));
+
+        },
+        setData: function (elem, key, value) {
+            return map([elem], function (elem) {
+                elem.setAttribute('data-' + key, JSON.stringify(value));
                 return elem;
 
             });
-        };
+        },
 
-        DOM.removeListener = function (elem, evt, listener) {
-            return map(arguments, function (elem, evt, listener) {
-                elem.detachEvent('on' + evt, listener);
-                return elem;
-
-            });
-        };
-    } else {
-        throw new Error('Unsupported browser');
-
-    }
+        addClass: null,
+        removeClass: null,
+        toggleClass: null,
+        hasClass: null
+    };
 
 
     var testElem = DOM.create('span'),
@@ -2365,64 +2379,6 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
             return true;
 
-        };
-    }
-
-    var reint = /^-?(?:(?:0|[1-9]\d*)|[1-9]\d*e(?:\+|-)\d+)$/i,
-        refloat = /^-?(?:(?:0|[1-9]\d*)\.\d+|[1-9]\d*\.\d+e(?:\+|-)\d+)$/i,
-        rebool = /^(?:true|false)$/i,
-        renull = /^null$/i;
-
-    var parseData = function (value) {
-        switch (true) {
-            case reint.test(value): return parseInt(value);
-            case refloat.test(value): return parseFloat(value);
-            case rebool.test(value): return value.toLowerCase() === 'true';
-            case renull.test(value): return null;
-            default:
-                try {
-                    return JSON.parse(value);
-
-                } catch (e) {
-                    return value;
-
-                }
-        }
-    };
-
-    testElem.setAttribute('data-test-prop', 'test-value');
-
-    if ('dataset' in testElem && 'testProp' in testElem.dataset) {
-        DOM.getData = function (elem, key) {
-            return parseData(getElem(elem).dataset[key]);
-
-        };
-
-        DOM.setData = function (elem, key, value) {
-            return map([elem], function (elem) {
-                elem.dataset[key] = JSON.stringify(value);
-                return elem;
-
-            });
-        };
-    } else {
-        var key2attr = function (key) {
-                return 'data-' + key.replace(/[A-Z]/g, function (m) {
-                    return '-' + m[0].toLowerCase();
-                });
-            };
-
-        DOM.getData = function (elem, key) {
-            return parseData(getElem(elem).getAttribute(key2attr(key)));
-
-        };
-
-        DOM.setData = function (elem, key, value) {
-            return map([elem], function (elem) {
-                elem.setAttribute(key2attr(key), JSON.stringify(value));
-                return elem;
-
-            });
         };
     }
 

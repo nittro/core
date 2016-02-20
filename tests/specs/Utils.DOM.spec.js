@@ -71,6 +71,12 @@ describe('Utils.DOM', function () {
         });
     });
 
+    describe('find()', function () {
+        it('returns all elements matching a simple selector', function () {
+            expect(DOM.find('#test-div-3, .test-class').length).toBe(4);
+        });
+    });
+
     describe('getChildren()', function () {
         it('returns non-text children of the specified element', function () {
             expect(document.getElementById('test-div-4').childNodes.length).toBe(3);
@@ -172,10 +178,10 @@ describe('Utils.DOM', function () {
             DOM.html(DOM.getById('test-span-1'), '<span id="test-span-data" data-test-int="42" data-test-float="3.4" data-test-bool="true" data-test-json="' + JSON.stringify(jsonData).replace(/"/g, '&quot;') + '"></span>');
 
             var elem = DOM.getById('test-span-data');
-            expect(DOM.getData(elem, 'testInt')).toBe(42);
-            expect(DOM.getData(elem, 'testFloat')).toBe(3.4);
-            expect(DOM.getData(elem, 'testBool')).toBe(true);
-            expect(DOM.getData(elem, 'testJson')).toEqual(jsonData);
+            expect(DOM.getData(elem, 'test-int')).toBe(42);
+            expect(DOM.getData(elem, 'test-float')).toBe(3.4);
+            expect(DOM.getData(elem, 'test-bool')).toBe(true);
+            expect(DOM.getData(elem, 'test-json')).toEqual(jsonData);
 
         });
     });
@@ -183,8 +189,8 @@ describe('Utils.DOM', function () {
     describe('setData()', function () {
         it('should set data in element\'s dataset', function () {
             var elem = DOM.getById('test-span-data');
-            DOM.setData(elem, 'testInt', 43);
-            expect(DOM.getData(elem, 'testInt')).toBe(43);
+            DOM.setData(elem, 'test-int', 43);
+            expect(DOM.getData(elem, 'test-int')).toBe(43);
         });
     });
 
