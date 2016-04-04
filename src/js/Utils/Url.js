@@ -245,7 +245,7 @@ _context.invoke('Utils', function(Strings, undefined) {
     };
 
     Url.prototype.isLocal = function() {
-        return this.compare(Url.fromCurrent()) <= Url.PART.PORT;
+        return this.compare(Url.fromCurrent()) < Url.PART.PORT;
 
     };
 
