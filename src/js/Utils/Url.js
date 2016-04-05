@@ -349,7 +349,7 @@ _context.invoke('Utils', function(Strings, undefined) {
     Url.buildQuery = function(data, pairs) {
         var q = [], n, en = encodeURIComponent;
 
-        var val = function (v) {
+        function val(v) {
             if (v === undefined) {
                 return null;
 
@@ -360,9 +360,9 @@ _context.invoke('Utils', function(Strings, undefined) {
                 return en('' + v);
 
             }
-        };
+        }
 
-        var flatten = function(a, n) {
+        function flatten(a, n) {
             var r = [], i;
 
             if (Array.isArray(a)) {
@@ -382,9 +382,9 @@ _context.invoke('Utils', function(Strings, undefined) {
                 }
             }
 
-            return r.filter(function(v) { return v !== null }).join('&');
+            return r.length ? r.filter(function(v) { return v !== null }).join('&') : null;
 
-        };
+        }
 
         for (n in data) {
             if (data[n] === null || data[n] === undefined) {
