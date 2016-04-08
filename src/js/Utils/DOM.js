@@ -220,8 +220,8 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             }
 
             return map([elem], function(elem) {
-                return window.getComputedStyle(elem).getPropertyValue(prop);
-                
+                return window.getComputedStyle(elem)[prop];
+
             });
         },
 
