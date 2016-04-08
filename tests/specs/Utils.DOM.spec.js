@@ -111,6 +111,23 @@ describe('Utils.DOM', function () {
         });
     });
 
+    describe('getStyle()', function () {
+        it('should return the element\'s computed style', function () {
+            rootElem.style.position = 'absolute';
+            rootElem.style.left = '10em';
+            rootElem.style.top = '10em';
+
+            var computed = DOM.getStyle(rootElem, 'left');
+            expect(computed).toEqual(jasmine.any(String));
+            expect(parseFloat(computed.replace(/px$/, ''))).toBeGreaterThan(0);
+
+            rootElem.style.position = '';
+            rootElem.style.left = '';
+            rootElem.style.top = '';
+
+        });
+    });
+
     describe('contains()', function () {
         it('should return true if the second argument is a descendant of the first argument', function () {
             var elem = DOM.getById('test-span-1');

@@ -1955,10 +1955,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     }
 
     function getPrefixed(elem, prop) {
-        if (Arrays.isArray(elem)) {
-            elem = elem[0];
-
-        }
+        elem = getElem(elem);
 
         if (prop in elem.style) {
             return prop;
@@ -2126,6 +2123,18 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             return map([elem], function (elem) {
                 elem.style[prop] = value;
 
+            });
+        },
+
+        getStyle: function(elem, prop, prefix) {
+            if (prefix !== false) {
+                prop = getPrefixed(elem, prop);
+
+            }
+
+            return map([elem], function(elem) {
+                return window.getComputedStyle(elem).getPropertyValue(prop);
+                
             });
         },
 
