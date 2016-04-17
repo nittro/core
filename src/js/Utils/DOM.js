@@ -213,16 +213,81 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             });
         },
 
-        getStyle: function(elem, prop, prefix) {
-            if (prefix !== false) {
-                prop = getPrefixed(elem, prop);
+        getStyle: function(elem, props, prefix) {
+            props = props.split(/\s+/g);
 
+            var prefixed = props;
+
+            if (prefix !== false) {
+                prefixed = props.map(function(prop) {
+                    return getPrefixed(elem, prop);
+                });
             }
 
             return map([elem], function(elem) {
-                return window.getComputedStyle(elem)[prop];
+                var style = window.getComputedStyle(elem);
 
+                if (props.length === 1) {
+                    return style[prefixed[0]];
+
+                } else {
+                    var res = {};
+
+                    props.forEach(function(prop, i) {
+                        res[prop] = style[prefixed[i]];
+
+                    });
+
+                    return res;
+
+                }
             });
+        },
+
+        getStyleFloat: function(elem, props, prefix) {
+            var style = DOM.getStyle(elem, props, prefix),
+                refloat = /^(\d+|\d*\.\d+)(px|m?s)?$/;
+
+            props = props.split(/\s+/g);
+
+            function normalizeValue(v) {
+                var m = refloat.exec(v);
+
+                if (m) {
+                    v = parseFloat(m[1]);
+
+                    if (m[2] === 's') {
+                        v *= 1000;
+
+                    }
+                }
+
+                return v;
+
+            }
+
+            function stylePropsToFloat(style) {
+                if (props.length === 1) {
+                    return normalizeValue(style);
+
+                } else {
+                    props.forEach(function(prop) {
+                        style[prop] = normalizeValue(style[prop]);
+
+                    });
+
+                    return style;
+
+                }
+            }
+
+            if (Arrays.isArray(style)) {
+                return style.map(stylePropsToFloat);
+
+            } else {
+                return stylePropsToFloat(style);
+
+            }
         },
 
         html: function (elem, html) {

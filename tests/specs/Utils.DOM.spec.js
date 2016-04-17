@@ -121,9 +121,38 @@ describe('Utils.DOM', function () {
             expect(computed).toEqual(jasmine.any(String));
             expect(parseFloat(computed.replace(/px$/, ''))).toBeGreaterThan(0);
 
+            rootElem.style.left = '30px';
+            rootElem.style.top = '30px';
+            computed = DOM.getStyle(rootElem, 'position left top');
+            expect(computed).toEqual({position: 'absolute', left: '30px', top: '30px'});
+
             rootElem.style.position = '';
             rootElem.style.left = '';
             rootElem.style.top = '';
+
+        });
+    });
+
+    describe('getStyleFloat()', function () {
+        it('should return the element\'s computed style with float-like values converted to floats, normalizing seconds to milliseconds', function () {
+            rootElem.style.position = 'absolute';
+            rootElem.style.left = '10em';
+            rootElem.style.top = '10em';
+
+            var computed = DOM.getStyleFloat(rootElem, 'left');
+            expect(computed).toEqual(jasmine.any(Number));
+            expect(computed).toBeGreaterThan(0);
+
+            rootElem.style.left = '30px';
+            rootElem.style.top = '30px';
+            rootElem.style.webkitTransition = 'opacity 3s';
+            computed = DOM.getStyleFloat(rootElem, 'position left top transitionDuration');
+            expect(computed).toEqual({position: 'absolute', left: 30, top: 30, transitionDuration: 3000});
+
+            rootElem.style.position = '';
+            rootElem.style.left = '';
+            rootElem.style.top = '';
+            rootElem.style.transition = '';
 
         });
     });
