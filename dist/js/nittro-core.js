@@ -742,11 +742,6 @@ _context.invoke('Utils', function(undefined) {
 _context.invoke('Utils', function(undefined) {
 
     var Arrays = {
-        isArray: function(a) {
-            return a && a.constructor === Array;
-
-        },
-
         isArrayLike: function(a) {
             return typeof a === 'object' && a.length !== undefined;
 
@@ -783,7 +778,7 @@ _context.invoke('Utils', function(undefined) {
         getKeys: function(a) {
             var keys = [], k;
 
-            if (Arrays.isArray(a)) {
+            if (Array.isArray(a)) {
                 for (k = 0; k < a.length; k++) {
                     keys.push(k);
 
@@ -1016,7 +1011,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
                 if (!keys) {
                     return data instanceof HashMap ? data.clone() : new HashMap(data);
 
-                } else if (!Arrays.isArray(keys)) {
+                } else if (!Array.isArray(keys)) {
                     throw new Error('Invalid argument supplied to HashMap.from(): the second argument must be an array');
 
                 }
@@ -1024,7 +1019,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
                 var map = new HashMap(),
                     i, n = keys.length,
                     k,
-                    arr = Arrays.isArray(data);
+                    arr = Array.isArray(data);
 
                 for (i = 0; i < n; i++) {
                     k = arr ? i : keys[i];
@@ -1067,7 +1062,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
         },
 
         merge: function (src) {
-            if (src instanceof HashMap || Arrays.isArray(src)) {
+            if (src instanceof HashMap || Array.isArray(src)) {
                 src.forEach(function(value, key) { this.set(key, value); }, this);
 
             } else if (typeof src === 'object' && src !== null) {
@@ -1087,7 +1082,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
         },
 
         append: function (src) {
-            if (src instanceof HashMap || Arrays.isArray(src)) {
+            if (src instanceof HashMap || Array.isArray(src)) {
                 src.forEach(function (value, key) {
                     if (typeof key === 'number') {
                         this.push(value);
@@ -1916,7 +1911,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     function map(args, callback) {
         args = Arrays.createFrom(args);
 
-        if (Arrays.isArray(args[0])) {
+        if (Array.isArray(args[0])) {
             for (var i = 0, elems = args[0], ret = []; i < elems.length; i++) {
                 args[0] = getElem(elems[i]);
 
@@ -1945,7 +1940,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     }
 
     function getElem(elem) {
-        if (Arrays.isArray(elem) || elem instanceof HTMLCollection || elem instanceof NodeList) {
+        if (Array.isArray(elem) || elem instanceof HTMLCollection || elem instanceof NodeList) {
             elem = elem[0];
 
         }
@@ -2194,7 +2189,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
                 }
             }
 
-            if (Arrays.isArray(style)) {
+            if (Array.isArray(style)) {
                 return style.map(stylePropsToFloat);
 
             } else {

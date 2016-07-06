@@ -1,11 +1,6 @@
 _context.invoke('Utils', function(undefined) {
 
     var Arrays = {
-        isArray: function(a) {
-            return a && a.constructor === Array;
-
-        },
-
         isArrayLike: function(a) {
             return typeof a === 'object' && a.length !== undefined;
 
@@ -42,7 +37,7 @@ _context.invoke('Utils', function(undefined) {
         getKeys: function(a) {
             var keys = [], k;
 
-            if (Arrays.isArray(a)) {
+            if (Array.isArray(a)) {
                 for (k = 0; k < a.length; k++) {
                     keys.push(k);
 

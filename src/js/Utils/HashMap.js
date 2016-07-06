@@ -18,7 +18,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
                 if (!keys) {
                     return data instanceof HashMap ? data.clone() : new HashMap(data);
 
-                } else if (!Arrays.isArray(keys)) {
+                } else if (!Array.isArray(keys)) {
                     throw new Error('Invalid argument supplied to HashMap.from(): the second argument must be an array');
 
                 }
@@ -26,7 +26,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
                 var map = new HashMap(),
                     i, n = keys.length,
                     k,
-                    arr = Arrays.isArray(data);
+                    arr = Array.isArray(data);
 
                 for (i = 0; i < n; i++) {
                     k = arr ? i : keys[i];
@@ -69,7 +69,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
         },
 
         merge: function (src) {
-            if (src instanceof HashMap || Arrays.isArray(src)) {
+            if (src instanceof HashMap || Array.isArray(src)) {
                 src.forEach(function(value, key) { this.set(key, value); }, this);
 
             } else if (typeof src === 'object' && src !== null) {
@@ -89,7 +89,7 @@ _context.invoke('Utils', function (Arrays, undefined) {
         },
 
         append: function (src) {
-            if (src instanceof HashMap || Arrays.isArray(src)) {
+            if (src instanceof HashMap || Array.isArray(src)) {
                 src.forEach(function (value, key) {
                     if (typeof key === 'number') {
                         this.push(value);

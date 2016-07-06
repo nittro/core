@@ -33,7 +33,7 @@ module.exports = function (grunt) {
             options: {
                 separator: ";\n"
             },
-            nettejs: {
+            nittro: {
                 files: {
                     'dist/js/nittro-core.js': NittroCore
                 }
@@ -44,8 +44,7 @@ module.exports = function (grunt) {
             src: NittroCore,
             options: {
                 vendor: [
-                    'bower_components/promiz/promiz.min.js',
-                    'bower_components/nette-forms/src/assets/netteForms.js'
+                    'bower_components/promiz/promiz.min.js'
                 ],
                 specs: 'tests/specs/**.spec.js',
                 display: 'short',

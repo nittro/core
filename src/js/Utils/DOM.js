@@ -3,7 +3,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     function map(args, callback) {
         args = Arrays.createFrom(args);
 
-        if (Arrays.isArray(args[0])) {
+        if (Array.isArray(args[0])) {
             for (var i = 0, elems = args[0], ret = []; i < elems.length; i++) {
                 args[0] = getElem(elems[i]);
 
@@ -32,7 +32,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     }
 
     function getElem(elem) {
-        if (Arrays.isArray(elem) || elem instanceof HTMLCollection || elem instanceof NodeList) {
+        if (Array.isArray(elem) || elem instanceof HTMLCollection || elem instanceof NodeList) {
             elem = elem[0];
 
         }
@@ -281,7 +281,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
                 }
             }
 
-            if (Arrays.isArray(style)) {
+            if (Array.isArray(style)) {
                 return style.map(stylePropsToFloat);
 
             } else {
