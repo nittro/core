@@ -7,9 +7,9 @@ var _context = (function() {
         REQ_TIMEOUT = 30000,
         undefined,
         doc = document,
-        loc = doc.location,
         elem = function(n) { return doc.createElement(n); },
         win = window,
+        loc = win.history.location || win.location, // support for HTML5 history polyfill
         setTimeout = function(c, t) { return win.setTimeout(c, t); },
         clearTimeout = function(t) { return win.clearTimeout(t); },
         promise = Promise;
@@ -1420,8 +1420,10 @@ _context.invoke('Utils', function (Arrays, undefined) {
 ;
 _context.invoke('Utils', function(Strings, undefined) {
 
+    var location = window.history.location || window.location; // support for HTML5 history polyfill
+
     var Url = function(s) {
-        var cur = document.location.href.match(Url.PARSER_REGEXP),
+        var cur = location.href.match(Url.PARSER_REGEXP),
 			src = s === null || s === '' || s === undefined ? cur : s.match(Url.PARSER_REGEXP),
             noHost = !src[4],
             path = src[6] || '';
@@ -1632,7 +1634,7 @@ _context.invoke('Utils', function(Strings, undefined) {
     };
 
     Url.prototype.toRelative = function(to) {
-        to = Url.from(to || document.location.href);
+        to = Url.from(to || location.href);
 
         if (to.getProtocol() !== this.getProtocol()) {
             return this.toAbsolute();

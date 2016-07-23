@@ -7,9 +7,9 @@ var _context = (function() {
         REQ_TIMEOUT = 30000,
         undefined,
         doc = document,
-        loc = doc.location,
         elem = function(n) { return doc.createElement(n); },
         win = window,
+        loc = win.history.location || win.location, // support for HTML5 history polyfill
         setTimeout = function(c, t) { return win.setTimeout(c, t); },
         clearTimeout = function(t) { return win.clearTimeout(t); },
         promise = Promise;

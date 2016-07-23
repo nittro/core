@@ -1,18 +1,6 @@
 module.exports = function (grunt) {
 
-    var NittroCore = [
-        'src/js/context.js',
-        'src/js/Utils/Strings.js',
-        'src/js/Utils/Arrays.js',
-        'src/js/Utils/HashMap.js',
-        'src/js/Utils/Url.js',
-        'src/js/Utils/DOM.js',
-        'src/js/Utils/ReflectionClass.js',
-        'src/js/Utils/ReflectionFunction.js',
-        'src/js/Nittro/EventEmitter.js',
-        'src/js/Nittro/Freezable.js',
-        'src/js/Nittro/Object.js'
-    ];
+    var files = grunt.file.readJSON('nittro.json').files;
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -24,7 +12,7 @@ module.exports = function (grunt) {
             },
             nittro: {
                 files: {
-                    'dist/js/nittro-core.min.js': NittroCore
+                    'dist/js/nittro-core.min.js': files.js
                 }
             }
         },
@@ -35,13 +23,13 @@ module.exports = function (grunt) {
             },
             nittro: {
                 files: {
-                    'dist/js/nittro-core.js': NittroCore
+                    'dist/js/nittro-core.js': files.js
                 }
             }
         },
 
         jasmine: {
-            src: NittroCore,
+            src: files.js,
             options: {
                 vendor: [
                     'bower_components/promiz/promiz.min.js'
