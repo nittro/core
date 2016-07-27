@@ -2257,8 +2257,15 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             });
         },
 
-        getData: function (elem, key) {
-            return parseData(getElem(elem).getAttribute('data-' + key));
+        getData: function (elem, key, def) {
+            elem = getElem(elem);
+            key = 'data-' + key;
+
+            if (!elem.hasAttribute(key)) {
+                return def;
+            }
+
+            return parseData(elem.getAttribute(key));
 
         },
         setData: function (elem, key, value) {

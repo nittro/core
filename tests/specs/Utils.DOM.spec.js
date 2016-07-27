@@ -228,6 +228,7 @@ describe('Utils.DOM', function () {
             expect(DOM.getData(elem, 'test-float')).toBe(3.4);
             expect(DOM.getData(elem, 'test-bool')).toBe(true);
             expect(DOM.getData(elem, 'test-json')).toEqual(jsonData);
+            expect(DOM.getData(elem, 'test-dummy', 34)).toBe(34);
 
         });
     });
