@@ -6,7 +6,8 @@ describe('Utils.DOM', function () {
         DOM = _context.lookup('Utils.DOM');
 
         listeners = {
-            click: function () {}
+            click: function () {},
+            custom: function() {}
         };
     });
 
@@ -180,6 +181,15 @@ describe('Utils.DOM', function () {
             DOM.removeListener(rootElem, 'click', listeners.click);
             DOM.getById('test-span-1').click();
             expect(listeners.click).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('trigger()', function () {
+        it('should trigger an event', function () {
+            spyOn(listeners, 'custom');
+            DOM.addListener(rootElem, 'custom', listeners.custom);
+            DOM.trigger('test-span-1', 'custom');
+            expect(listeners.custom).toHaveBeenCalled();
         });
     });
 

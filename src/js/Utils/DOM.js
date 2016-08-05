@@ -1,5 +1,7 @@
 _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
+    /****** Utilities *******/
+
     function map(args, callback) {
         args = Arrays.createFrom(args);
 
@@ -76,6 +78,106 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
         }
     }
+
+
+
+
+    /******* CustomEvent support in IE9+ ******/
+
+    if (typeof window.CustomEvent !== 'function') {
+        window.CustomEvent = function(event, params) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent('CustomEvent');
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+            return evt;
+        };
+
+        window.CustomEvent.prototype = window.Event.prototype;
+
+    }
+
+    var knownEventModules = {
+        MouseEvent: {
+            create: function(type, params) {
+                params.view || (params.view = window);
+                return new MouseEvent(type, params);
+            },
+            init: function(event, type, params) {
+                event.initMouseEvent(
+                    type,
+                    params.bubbles,
+                    params.cancelable,
+                    params.view || window,
+                    params.detail || 1,
+                    params.screenX || 0,
+                    params.screenY || 0,
+                    params.clientX || 0,
+                    params.clientY || 0,
+                    params.ctrlKey || false,
+                    params.altKey || false,
+                    params.shiftKey || false,
+                    params.metaKey || false,
+                    params.button || 1,
+                    params.relatedTarget
+                );
+            }
+        },
+        KeyboardEvent: {
+            create: function(type, params) { return new KeyboardEvent(type, params); },
+            init: function(event, type, params) {
+                var modifiers = [];
+                params.ctrlKey && modifiers.push('Control');
+                params.shiftKey && modifiers.push('Shift');
+                params.altKey && modifiers.push('Alt');
+                params.metaKey && modifiers.push('Meta');
+                event.initKeyboardEvent(type, params.bubbles, params.cancelable, params.view || window, params.key || '', params.location || 0, modifiers.join(' '));
+            }
+        },
+        FocusEvent: {
+            create: function(type, params) { return new FocusEvent(type, params); },
+            init: function(event, type, params) {
+                event.initUIEvent(type, params.bubbles, params.cancelable, params.view || window, params.detail || 0);
+            },
+            name: 'UIEvent'
+        },
+        HTMLEvents: {
+            create: function(type, params) { return new Event(type, params); },
+            init: function(event, type, params) {
+                event.initEvent(type, params.bubbles, params.cancelable);
+            }
+        },
+        CustomEvent: {
+            create: function(type, params) { return new CustomEvent(type, params); },
+            init: function(event, type, params) {
+                event.initCustomEvent(type, params.bubbles, params.cancelable, params.detail);
+            }
+        }
+    };
+
+    var knownEvents = {
+        click: 'MouseEvent',
+        dblclick: 'MouseEvent',
+        mousedown: 'MouseEvent',
+        mouseenter: 'MouseEvent',
+        mouseleave: 'MouseEvent',
+        mousemove: 'MouseEvent',
+        mouseout: 'MouseEvent',
+        mouseover: 'MouseEvent',
+        mouseup: 'MouseEvent',
+        contextmenu: 'MouseEvent',
+        keydown: 'KeyboardEvent',
+        keypress: 'KeyboardEvent',
+        keyup: 'KeyboardEvent',
+        focus: 'FocusEvent',
+        blur: 'FocusEvent',
+        change: 'HTMLEvents',
+        submit: 'HTMLEvents',
+        reset: 'HTMLEvents'
+    };
+
+
+
+    /******* Public interface *******/
 
     var DOM = {
         getByClassName: function (className, context) {
@@ -345,6 +447,27 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
                 return elem;
 
             });
+        },
+
+        trigger: function (elem, evt, params) {
+            var module = knownEvents[evt] || 'CustomEvent',
+                event;
+
+            params || (params = {});
+            'bubbles' in params || (params.bubbles = true);
+            'cancelable' in params || (params.cancelable = true);
+
+            try {
+                event = knownEventModules[module].create(evt, params);
+
+            } catch (e) {
+                event = document.createEvent(knownEventModules[module].name || module);
+                knownEventModules[module].init(event, evt, params);
+
+            }
+
+            return getElem(elem).dispatchEvent(event);
+
         },
 
         getData: function (elem, key, def) {
