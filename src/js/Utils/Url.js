@@ -419,7 +419,7 @@ _context.invoke('Utils', function(Strings, undefined) {
         var p = {}, a = false, c, d, k, i, m, n, v;
 
         var convertType = function(v) {
-            if (v.match(/^\d+$/)) {
+            if (v.match(/^(?:[1-9]\d*|0)$/)) {
                 return parseInt(v);
 
             } else if (v.match(/^\d*\.\d+$/)) {

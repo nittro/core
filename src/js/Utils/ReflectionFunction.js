@@ -3,8 +3,18 @@ _context.invoke('Utils', function(Arrays, undefined) {
     var ReflectionFunction = function(f) {
         this._ = {
             reflectedFunction: f,
-            argsList: f.length ? f.toString().match(/^function\s*\(\s*(.*?)\s*\)/i)[1].split(/\s*,\s*/) : []
+            argsList: null,
+            name: null
         };
+
+        var parts = f.toString()
+            .match(/^\s*function(?:\s*|\s+([^\(]+?)\s*)\(\s*([\s\S]*?)\s*\)/i);
+
+        this._.name = parts[1] || null;
+        this._.argsList = !parts[2] ? [] : parts[2]
+            .replace(/\/\*\*?[\s\S]*?\*\//g, '')
+            .trim()
+            .split(/\s*,\s*/);
 
     };
 
@@ -13,16 +23,21 @@ _context.invoke('Utils', function(Arrays, undefined) {
 
     };
 
-    ReflectionFunction.prototype.invoke = function(context) {
-        var args = Arrays.createFrom(arguments);
-        args.shift();
-
-        return this._.reflectedFunction.apply(context, args);
+    ReflectionFunction.prototype.getName = function () {
+        return this._.name;
 
     };
 
     ReflectionFunction.prototype.getArgs = function () {
         return this._.argsList;
+
+    };
+
+    ReflectionFunction.prototype.invoke = function(context) {
+        var args = Arrays.createFrom(arguments);
+        args.shift();
+
+        return this._.reflectedFunction.apply(context, args);
 
     };
 

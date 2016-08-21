@@ -3,7 +3,6 @@ var _context = (function() {
         api,
         loaded = [],
         loading = {},
-        indexOf = Array.prototype.indexOf,
         REQ_TIMEOUT = 30000,
         undefined,
         doc = document,
@@ -12,31 +11,22 @@ var _context = (function() {
         loc = win.history.location || win.location, // support for HTML5 history polyfill
         setTimeout = function(c, t) { return win.setTimeout(c, t); },
         clearTimeout = function(t) { return win.clearTimeout(t); },
-        promise = Promise;
+        promise = Promise,
+        resolver = null,
+        nsStack = [],
+        map = {
+            names: [],
+            classes: []
+        };
 
-    if (typeof indexOf !== 'function') {
-        indexOf = function(e) {
-            for (var i = 0; i < this.length; i++) {
-                if (this[i] === e) {
-                    return i;
-                }
-            }
-
-            return -1;
-
-        }
-    }
-
-    var resolver = null;
-
-    var resolveUrl = function(u) {
+    function resolveUrl(u) {
         resolver || (resolver = elem('a'));
         resolver.href = u;
         return resolver.href;
-    };
+    }
 
 
-    var isRelative = function(u) {
+    function isRelative(u) {
         try {
             var len = /^https?:\/\/.+?(\/|$)/i.exec(loc.href)[0].length;
             return u.substr(0, len) === loc.href.substr(0, len);
@@ -45,7 +35,7 @@ var _context = (function() {
             return false;
 
         }
-    };
+    }
 
     var xhrFactory = (function(o, f) {
         while(o.length) {
@@ -83,7 +73,7 @@ var _context = (function() {
 
     })();
 
-    var xhr = function(u) {
+    function xhr(u) {
         return new promise(function(fulfill, reject) {
             var req,
                 m;
@@ -147,9 +137,9 @@ var _context = (function() {
             }, REQ_TIMEOUT);
 
         });
-    };
+    }
 
-    var exec = function(s, t, u) {
+    function exec(s, t, u) {
         var e;
 
         if (!t) {
@@ -199,15 +189,9 @@ var _context = (function() {
             doc.head.appendChild(e).parentNode.removeChild(e);
 
         }
+    }
 
-    };
-
-    var map = {
-        names: [],
-        classes: []
-    };
-
-    var lookup = function(s, c) {
+    function lookup(s, c) {
         var i = map.names.indexOf(s);
 
         if (i > -1) {
@@ -240,9 +224,9 @@ var _context = (function() {
 
         return r;
 
-    };
+    }
 
-    var lookupClass = function (o) {
+    function lookupClass(o) {
         if (typeof o === 'object' && o.constructor !== Object) {
             o = o.constructor;
 
@@ -257,11 +241,9 @@ var _context = (function() {
 
         return i === -1 ? false : map.names[i];
 
-    };
+    }
 
-
-
-    var load = function () {
+    function load() {
         var u, a, p = promise.resolve(true);
 
         for (a = 0; a < arguments.length; a++) {
@@ -276,7 +258,7 @@ var _context = (function() {
             } else if (typeof arguments[a] === 'string') {
                 u = resolveUrl(arguments[a]);
 
-                if (indexOf.call(loaded, u) === -1) {
+                if (loaded.indexOf(u) === -1) {
                     if (loading[u]) {
                         p = p.then(function (p) {
                             return function () {
@@ -316,13 +298,10 @@ var _context = (function() {
 
             }
         };
-    };
+    }
 
 
-    var nsStack = [];
-
-
-    var invoke = function(ns, f, i) {
+    function invoke(ns, f, i) {
         if (i === undefined && typeof ns === 'function') {
             i = f;
             f = ns;
@@ -381,9 +360,9 @@ var _context = (function() {
         nsStack.shift();
         return r;
 
-    };
+    }
 
-    var register = function (constructor, name) {
+    function register(constructor, name) {
         var ns = name.split(/\./g),
             key = ns.pop();
 
@@ -407,9 +386,9 @@ var _context = (function() {
         map.classes.push(constructor);
         return api;
 
-    };
+    }
 
-    var __ns = function () {
+    function __ns() {
         if (arguments.length) {
             nsStack.unshift(arguments[0], arguments[1]);
 
@@ -417,9 +396,9 @@ var _context = (function() {
             nsStack.shift();
             nsStack.shift();
         }
-    };
+    }
 
-    var extend = function (parent, constructor, proto) {
+    function extend(parent, constructor, proto) {
         if (!proto) {
             proto = constructor;
             constructor = parent;
@@ -453,20 +432,30 @@ var _context = (function() {
 
         return constructor;
 
-    };
+    }
 
-    var mixin = function (target, source, map) {
+    function mixin(target, source, map) {
+        if (typeof target === 'string') {
+            target = lookup(target);
+
+        }
+
         if (typeof source === 'string') {
             source = lookup(source);
 
         }
 
+        if (source.hasOwnProperty('STATIC') && source.STATIC) {
+            merge(target, source.STATIC);
+            
+        }
+
         copyProps(target.prototype, source, map);
         return target;
 
-    };
+    }
 
-    var copyProps = function (target, source, map) {
+    function copyProps(target, source, map) {
         var key;
 
         for (key in source) {
@@ -475,7 +464,29 @@ var _context = (function() {
 
             }
         }
-    };
+    }
+
+    function merge(a, b) {
+        for (var key in b) {
+            if (b.hasOwnProperty(key)) {
+                if (!a.hasOwnProperty(key)) {
+                    a[key] = b[key];
+
+                } else if (typeof a[key] === 'object' && typeof b[key] === 'object') {
+                    if (!a[key]) {
+                        a[key] = b[key];
+
+                    } else if (b[key]) {
+                        merge(a[key], b[key]);
+
+                    }
+                } else {
+                    a[key] = b[key];
+
+                }
+            }
+        }
+    }
 
     return api = {
         lookup: lookup,
