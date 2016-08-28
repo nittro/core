@@ -418,18 +418,20 @@ _context.invoke('Utils', function(Strings, undefined) {
 
         var p = {}, a = false, c, d, k, i, m, n, v;
 
-        var convertType = function(v) {
-            if (v.match(/^(?:[1-9]\d*|0)$/)) {
-                return parseInt(v);
+        function convertType(v) {
+            var c;
 
-            } else if (v.match(/^\d*\.\d+$/)) {
-                return parseFloat(v);
+            if (v.match(/^(?:[1-9]\d*|0)$/) && (c = parseInt(v)) + '' === v) {
+                return c;
+
+            } else if (v.match(/^\d*\.\d+$/) && (c = parseFloat(v)) + '' === v) {
+                return c;
 
             }
 
             return v;
 
-        };
+        }
 
         for (i = 0; i < s.length; i++) {
             m = s[i].split('=');
