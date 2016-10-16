@@ -2368,6 +2368,55 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             });
         },
 
+        empty: function(elem) {
+            return map(arguments, function (elem) {
+                while (elem.firstChild) {
+                    elem.removeChild(elem.firstChild);
+                }
+            });
+        },
+
+        append: function (elem, children) {
+            elem = getElem(elem);
+            children = Array.isArray(children) ? children : Arrays.createFrom(arguments, 1);
+
+            children.forEach(function(child) {
+                elem.appendChild(child);
+            });
+
+            return elem;
+
+        },
+
+        prepend: function (elem, children) {
+            elem = getElem(elem);
+            children = Array.isArray(children) ? children : Arrays.createFrom(arguments, 1);
+
+            var first = elem.firstChild;
+
+            children.forEach(function(child) {
+                elem.insertBefore(child, first);
+            });
+
+            return elem;
+
+        },
+
+        insertBefore: function(before, elem) {
+            var elems = Array.isArray(elem) ? elem : Arrays.createFrom(arguments, 1),
+                parent;
+
+            before = getElem(before);
+            parent = before.parentNode;
+
+            elems.forEach(function(elem) {
+                parent.insertBefore(elem, before);
+            });
+
+            return before;
+
+        },
+
         contains: function( a, b ) {
             var adown = a.nodeType === 9 ? a.documentElement : a,
                 bup = b && b.parentNode;

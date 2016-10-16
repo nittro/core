@@ -58,6 +58,40 @@ describe('Utils.DOM', function () {
         });
     });
 
+    describe('append()', function () {
+        it('appends all elements to the given parent in the order specified', function () {
+            var elems = DOM.createFromHtml('<span>4</span><span>5</span><span>6</span>');
+            DOM.append(document.getElementById('test-span-1'), elems);
+            expect(document.getElementById('test-span-1').childNodes.length).toBe(3);
+            expect(document.getElementById('test-span-1').textContent).toBe('456');
+        });
+    });
+
+    describe('prepend()', function () {
+        it('prepends all elements to the given parent in the order specified', function () {
+            var elems = DOM.createFromHtml('<span>1</span><span>2</span><span>3</span>');
+            DOM.prepend(document.getElementById('test-span-1'), elems);
+            expect(document.getElementById('test-span-1').childNodes.length).toBe(6);
+            expect(document.getElementById('test-span-1').textContent).toBe('123456');
+        });
+    });
+
+    describe('insertBefore()', function () {
+        it('inserts the specified nodes before the given sibling node in the order specified', function () {
+            var elems = DOM.createFromHtml('<span>a</span><span>b</span><span>c</span>');
+            DOM.insertBefore(document.getElementById('test-span-1').childNodes.item(3), elems);
+            expect(document.getElementById('test-span-1').childNodes.length).toBe(9);
+            expect(document.getElementById('test-span-1').textContent).toBe('123abc456');
+        });
+    });
+
+    describe('empty()', function () {
+        it('removes all child nodes from the specified parent node', function () {
+            DOM.empty(document.getElementById('test-span-1'));
+            expect(document.getElementById('test-span-1').childNodes.length).toBe(0);
+        });
+    });
+
     describe('getByClassName()', function () {
         it('returns all elements which have the specified class', function () {
             expect(DOM.getByClassName('test-class').length).toBe(3);
