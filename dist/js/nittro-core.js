@@ -2098,6 +2098,21 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         reset: 'HTMLEvents'
     };
 
+    var containers = {
+        caption: 'table',
+        colgroup: 'table',
+        col: 'colgroup',
+        thead: 'table',
+        tbody: 'table',
+        tfoot: 'table',
+        tr: 'table',
+        th: 'tr',
+        td: 'tr',
+        li: 'ul',
+        optgroup: 'select',
+        option: 'select'
+    };
+
 
 
     /******* Public interface *******/
@@ -2183,17 +2198,24 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         createFromHtml: function (html) {
-            var container = DOM.create('div');
-            DOM.html(container, html);
-            html = DOM.getChildren(container);
+            var container,
+                elems;
 
-            html.forEach(function (e) {
+            if (container = html.match(/^\s*<(caption|colgroup|col|thead|tbody|tfoot|tr|th|td|li|optgroup|option)[\s>]/i)) {
+                container = containers[container[1].toLowerCase()];
+            }
+
+            container = DOM.create(container || 'div');
+            DOM.html(container, html);
+            elems = DOM.getChildren(container);
+
+            elems.forEach(function (e) {
                 container.removeChild(e);
             });
 
             container = null;
 
-            return html.length > 1 ? html : html[0];
+            return elems.length > 1 ? elems : elems[0];
 
         },
 
