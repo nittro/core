@@ -110,6 +110,12 @@ describe('Utils.Url', function () {
         });
     });
 
+    describe('getOrigin()', function () {
+        it('should return the protocol, hostname and port of the URL', function () {
+            expect(testUrl.getOrigin()).toBe('https://myhost.com:440');
+        });
+    });
+
     describe('getPath()', function () {
         it('should return the path portion of the URL', function () {
             expect(testUrl.getPath()).toBe('/path/to/file.json');

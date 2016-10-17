@@ -1510,6 +1510,10 @@ _context.invoke('Utils', function(Strings, undefined) {
 
     };
 
+    Url.prototype.getOrigin = function () {
+        return this._.protocol + '//' + this._.hostname + (this._.port ? ':' + this._.port : '');
+    };
+
     Url.prototype.getPath = function() {
         return this._.path;
 
