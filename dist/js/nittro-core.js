@@ -2265,7 +2265,9 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         getStyle: function(elem, props, prefix) {
-            props = props.split(/\s+/g);
+            if (!Array.isArray(props)) {
+                props = props.split(/\s+/g);
+            }
 
             var prefixed = props;
 
@@ -2296,10 +2298,12 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         getStyleFloat: function(elem, props, prefix) {
+            if (!Array.isArray(props)) {
+                props = props.split(/\s+/g);
+            }
+            
             var style = DOM.getStyle(elem, props, prefix),
                 refloat = /^(\d+|\d*\.\d+)(px|m?s)?$/;
-
-            props = props.split(/\s+/g);
 
             function normalizeValue(v) {
                 var m = refloat.exec(v);
