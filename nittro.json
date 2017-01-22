@@ -7,6 +7,7 @@
             "src/js/Utils/HashMap.js",
             "src/js/Utils/Url.js",
             "src/js/Utils/DOM.js",
+            "src/js/Utils/CSSTransitions.js",
             "src/js/Utils/ReflectionClass.js",
             "src/js/Utils/ReflectionFunction.js",
             "src/js/Nittro/EventEmitter.js",

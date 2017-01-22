@@ -5,6 +5,7 @@
 /*! @include file="src/js/Utils/HashMap.js" */
 /*! @include file="src/js/Utils/Url.js" */
 /*! @include file="src/js/Utils/DOM.js" */
+/*! @include file="src/js/Utils/CSSTransitions.js" */
 /*! @include file="src/js/Utils/ReflectionClass.js" */
 /*! @include file="src/js/Utils/ReflectionFunction.js" */
 /*! @include file="src/js/Nittro/EventEmitter.js" */
