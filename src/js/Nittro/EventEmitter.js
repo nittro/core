@@ -145,9 +145,11 @@ _context.invoke('Nittro', function () {
     var trigger = function (self, evt, data) {
         var e, _ = self._.eventEmitter;
 
-        if (typeof evt !== "object") {
-            e = new NittroEvent(evt, data);
-
+        if (typeof evt === "object") {
+            e = evt;
+            evt = e.type;
+        } else {
+            e = new NittroEvent(self, evt, data);
         }
 
         if (_.listeners.hasOwnProperty(evt)) {
@@ -205,7 +207,7 @@ _context.invoke('Nittro', function () {
         },
 
         trigger: function (evt, data) {
-            if (prepare(this, false) === false) return this;
+            prepare(this);
             return trigger(this, evt, data);
 
         }
@@ -219,7 +221,8 @@ _context.invoke('Nittro', function () {
         return false;
     };
 
-    var NittroEvent = _context.extend(function (type, data) {
+    var NittroEvent = _context.extend(function (target, type, data) {
+        this.target = target;
         this.type = type;
         this.data = data || {};
 
