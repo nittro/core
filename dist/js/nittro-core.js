@@ -2436,16 +2436,16 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
                 ));
         },
 
-        addListener: function (elem, evt, listener) {
-            return map(arguments, function (elem, evt, listener) {
-                elem.addEventListener(evt, listener, false);
+        addListener: function (elem, evt, listener, capture) {
+            return map(arguments, function (elem, evt, listener, capture) {
+                elem.addEventListener(evt, listener, !!capture);
                 return elem;
 
             });
         },
-        removeListener: function (elem, evt, listener) {
-            return map(arguments, function (elem, evt, listener) {
-                elem.removeEventListener(evt, listener, false);
+        removeListener: function (elem, evt, listener, capture) {
+            return map(arguments, function (elem, evt, listener, capture) {
+                elem.removeEventListener(evt, listener, !!capture);
                 return elem;
 
             });
