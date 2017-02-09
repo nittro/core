@@ -1,18 +1,18 @@
 {
     "files": {
         "js": [
-            "src/js/context.js",
-            "src/js/Utils/Strings.js",
-            "src/js/Utils/Arrays.js",
-            "src/js/Utils/HashMap.js",
-            "src/js/Utils/Url.js",
-            "src/js/Utils/DOM.js",
-            "src/js/Utils/CSSTransitions.js",
-            "src/js/Utils/ReflectionClass.js",
-            "src/js/Utils/ReflectionFunction.js",
-            "src/js/Nittro/EventEmitter.js",
-            "src/js/Nittro/Freezable.js",
-            "src/js/Nittro/Object.js"
+            "src/context.js",
+            "src/Utils/Strings.js",
+            "src/Utils/Arrays.js",
+            "src/Utils/HashMap.js",
+            "src/Utils/Url.js",
+            "src/Utils/DOM.js",
+            "src/Utils/CSSTransitions.js",
+            "src/Utils/ReflectionClass.js",
+            "src/Utils/ReflectionFunction.js",
+            "src/Nittro/EventEmitter.js",
+            "src/Nittro/Freezable.js",
+            "src/Nittro/Object.js"
         ]
     },
     "compat": {

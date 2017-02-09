@@ -2,16 +2,13 @@
     "name": "nittro-core",
     "homepage": "https://www.nittro.org",
     "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/nittro/core/issues",
+        "email": "nittro@nittro.org"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/nittro/core.git"
     },
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-cli": "^0.1.13",
-        "grunt-contrib-jasmine": "^1.0.0",
-        "grunt-contrib-uglify": "^0.11.1",
-        "grunt-contrib-concat": "^0.5.1",
-        "uglify-js": "^2.6.1"
-    }
+    "devDependencies": {}
 }
