@@ -15,5 +15,12 @@
     "dependencies": {
         "promiz": "^1.0.5"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "gulp": "^3.9.1",
+        "gulp-jasmine-browser": "^1.7.1",
+        "phantomjs-prebuilt": "^2.1.14"
+    },
+    "scripts": {
+        "test": "gulp test"
+    }
 }
