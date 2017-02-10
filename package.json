@@ -10,5 +10,8 @@
         "type": "git",
         "url": "https://github.com/nittro/core.git"
     },
+    "dependencies": {
+        "promiz": "^1.0.5"
+    },
     "devDependencies": {}
 }
