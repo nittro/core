@@ -423,10 +423,21 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
                 elem.innerHTML = html;
 
                 Arrays.createFrom(elem.getElementsByTagName('script')).forEach(function (elem) {
-                    if (!elem.type || elem.type.toLowerCase() === 'text/javascript') {
+                    var type = elem.type ? elem.type.toLowerCase() : null;
+
+                    if (!type || type === 'text/javascript' || type === 'application/javascript') {
                         var load = elem.hasAttribute('src'),
                             src = load ? elem.src : (elem.text || elem.textContent || elem.innerHTML || ''),
-                            script = DOM.create('script', {type: 'text/javascript'});
+                            attrs = {}, i,
+                            script;
+
+                        for (i = 0; i < elem.attributes.length; i++) {
+                            if (elem.attributes.item(i).name !== 'src') {
+                                attrs[elem.attributes.item(i).name] = elem.attributes.item(i).value;
+                            }
+                        }
+
+                        script = DOM.create('script', attrs);
 
                         if (load) {
                             script.src = src;
