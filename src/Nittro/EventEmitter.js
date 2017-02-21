@@ -1,6 +1,6 @@
 _context.invoke('Nittro', function () {
 
-    var prepare = function (self, need) {
+    function prepare (self, need) {
         if (!self._) {
             if (need === false) return false;
             self._ = {};
@@ -16,9 +16,9 @@ _context.invoke('Nittro', function () {
                 namespaces: []
             };
         }
-    };
+    }
 
-    var prepareNamespaces = function (emitter, namespaces) {
+    function prepareNamespaces (emitter, namespaces) {
         return namespaces.map(function (ns) {
             var i = emitter.namespaces.indexOf(ns);
 
@@ -30,9 +30,9 @@ _context.invoke('Nittro', function () {
             return i;
 
         });
-    };
+    }
 
-    var hasCommonElement = function (a, b) {
+    function hasCommonElement (a, b) {
         var i = 0, j = 0;
 
         while (i < a.length && j < b.length) {
@@ -44,9 +44,9 @@ _context.invoke('Nittro', function () {
 
         return false;
 
-    };
+    }
 
-    var process = function (emitter, evt, op, arg1, arg2) {
+    function process (emitter, evt, op, arg1, arg2) {
         evt = (evt || '').replace(/^\s+|\s+$/g, '').split(/\s+/g);
 
         evt.forEach(function (e) {
@@ -59,9 +59,9 @@ _context.invoke('Nittro', function () {
             op(emitter, e, ns, dflt[1] === 'default', arg1, arg2);
 
         });
-    };
+    }
 
-    var add = function (emitter, evt, ns, dflt, handler, mode) {
+    function add (emitter, evt, ns, dflt, handler, mode) {
         if (!evt) {
             throw new TypeError('No event specified');
 
@@ -89,9 +89,9 @@ _context.invoke('Nittro', function () {
         emitter.listeners[evt] || (emitter.listeners[evt] = []);
         emitter.listeners[evt].push({handler: handler, namespaces: ns, mode: mode});
 
-    };
+    }
 
-    var remove = function (emitter, evt, ns, dflt, handler) {
+    function remove (emitter, evt, ns, dflt, handler) {
         if (!evt) {
             var listeners = dflt ? emitter.defaultListeners : emitter.listeners;
 
@@ -140,9 +140,9 @@ _context.invoke('Nittro', function () {
 
             }
         }
-    };
+    }
 
-    var trigger = function (self, evt, data) {
+    function trigger (self, evt, data) {
         var e, _ = self._.eventEmitter;
 
         if (typeof evt === "object") {
@@ -167,14 +167,23 @@ _context.invoke('Nittro', function () {
             });
         }
 
-        if (!e.isDefaultPrevented() && _.defaultListeners.hasOwnProperty(evt)) {
-            _.defaultListeners[evt].call(self, e);
-
+        if (e.isAsync()) {
+            e.then(function () {
+                triggerDefault(self, _, evt, e);
+            });
+        } else {
+            triggerDefault(self, _, evt, e);
         }
 
         return e;
 
-    };
+    }
+
+    function triggerDefault (self, _, evt, e) {
+        if (!e.isDefaultPrevented() && _.defaultListeners.hasOwnProperty(evt)) {
+            _.defaultListeners[evt].call(self, e);
+        }
+    }
 
     var NittroEventEmitter = {
         on: function (evt, handler) {
@@ -213,18 +222,21 @@ _context.invoke('Nittro', function () {
         }
     };
 
-    var returnTrue = function () {
+    function returnTrue() {
         return true;
-    };
+    }
 
-    var returnFalse = function () {
+    function returnFalse() {
         return false;
-    };
+    }
 
     var NittroEvent = _context.extend(function (target, type, data) {
         this.target = target;
         this.type = type;
         this.data = data || {};
+
+        this._queue = null;
+        this._promise = null;
 
     }, {
         preventDefault: function () {
@@ -232,8 +244,29 @@ _context.invoke('Nittro', function () {
 
         },
 
-        isDefaultPrevented: returnFalse
+        isDefaultPrevented: returnFalse,
 
+        waitFor: function (promise) {
+            if (this._promise) {
+                throw new Error('The event\'s queue has already been frozen');
+            }
+
+            this._queue || (this._queue = []);
+            this._queue.push(promise);
+            return this;
+        },
+
+        isAsync: function () {
+            return !!this._queue;
+        },
+
+        then: function (onfulfilled, onrejected) {
+            if (!this._promise) {
+                this._promise = this._queue ? Promise.all(this._queue) : Promise.resolve();
+            }
+
+            return this._promise.then(onfulfilled, onrejected);
+        }
     });
 
     _context.register(NittroEventEmitter, 'EventEmitter');

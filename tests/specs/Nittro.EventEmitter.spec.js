@@ -21,7 +21,9 @@ describe('Nittro.EventEmitter', function () {
             prevent: function(evt) { evt.preventDefault() },
             def: function() {},
             ns: function() {},
-            data: function(evt) {}
+            data: function(evt) {},
+            async: function(evt) { evt.waitFor(new Promise(function(fulfill) { window.setTimeout(fulfill, 100); })); },
+            asyncDef: function () {}
         };
 
         spyOn(listeners, 'all');
@@ -31,6 +33,8 @@ describe('Nittro.EventEmitter', function () {
         spyOn(listeners, 'def');
         spyOn(listeners, 'ns');
         spyOn(listeners, 'data');
+        spyOn(listeners, 'async').and.callThrough();
+        spyOn(listeners, 'asyncDef');
 
     });
 
@@ -114,6 +118,26 @@ describe('Nittro.EventEmitter', function () {
             testInstance.off('.testns');
             testInstance.trigger('event2');
             expect(listeners.ns).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('async events', function () {
+        it('should provide Promise interface', function (done) {
+            testInstance.on('asyncEvent', listeners.async);
+            testInstance.on('asyncEvent:default', listeners.asyncDef);
+            var e = testInstance.trigger('asyncEvent');
+
+            expect(e.isAsync()).toBe(true);
+            expect(e.then).toEqual(jasmine.any(Function));
+            expect(listeners.async).toHaveBeenCalledTimes(1);
+            expect(listeners.asyncDef).not.toHaveBeenCalled();
+
+            e.then(function () {
+                expect(listeners.asyncDef).toHaveBeenCalledTimes(1);
+                done();
+            }, function () {
+                done.fail('Promise had been rejected');
+            });
         });
     });
 
