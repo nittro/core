@@ -353,7 +353,11 @@ _context.invoke('Utils', function(Strings, undefined) {
     };
 
     Url.buildQuery = function(data, pairs) {
-        var q = [], n, en = encodeURIComponent;
+        var q = [], n;
+
+        function en(v) {
+            return encodeURIComponent(v).replace(/%20/g, '+');
+        }
 
         function val(v) {
             if (v === undefined) {
@@ -422,6 +426,10 @@ _context.invoke('Utils', function(Strings, undefined) {
 
         var p = {}, a = false, c, d, k, i, m, n, v;
 
+        function dec(v) {
+            return decodeURIComponent(v.replace(/\+/g,' '));
+        }
+
         function convertType(v) {
             var c;
 
@@ -439,8 +447,8 @@ _context.invoke('Utils', function(Strings, undefined) {
 
         for (i = 0; i < s.length; i++) {
             m = s[i].split('=');
-            n = decodeURIComponent(m.shift());
-            v = convertType(decodeURIComponent(m.join('=')));
+            n = dec(m.shift());
+            v = convertType(dec(m.join('=')));
 
             if (n.indexOf('[') !== -1) {
                 n = n.replace(/\]/g, '');
