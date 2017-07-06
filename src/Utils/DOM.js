@@ -580,7 +580,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
                 do {
                     elems.push(elem);
                     ids.push(elem.id);
-                    classes.push(elem.className ? elem.className.trim().split(/\s+/g) : []);
+                    classes.push(((elem.className || '') + '').trim().split(/\s+/g));
                 } while (elem = elem.parentNode);
 
                 for (i = 0; i < elems.length; i++) {
