@@ -7,7 +7,8 @@ describe('Utils.DOM', function () {
 
         listeners = {
             click: function () {},
-            custom: function() {}
+            custom: function() {},
+            delegate: function() {}
         };
     });
 
@@ -224,6 +225,26 @@ describe('Utils.DOM', function () {
             DOM.addListener(rootElem, 'custom', listeners.custom);
             DOM.trigger('test-span-1', 'custom');
             expect(listeners.custom).toHaveBeenCalled();
+        });
+    });
+
+    describe('delegate()', function () {
+        it('should create a delegate event listener', function () {
+            spyOn(listeners, 'delegate');
+
+            var listener = DOM.delegate('.test-class, #test-span-1', listeners.delegate);
+
+            DOM.addListener(rootElem, 'click', listener);
+            DOM.trigger('test-span-1', 'click');
+            expect(listeners.delegate).toHaveBeenCalledTimes(2);
+            expect(listeners.delegate.calls.first().object).toBe(document.getElementById('test-span-1'));
+            expect(listeners.delegate.calls.mostRecent().object).toBe(document.getElementById('test-div-3'));
+
+            DOM.trigger('test-span-2', 'click');
+            expect(listeners.delegate).toHaveBeenCalledTimes(3);
+            expect(listeners.delegate.calls.mostRecent().object).toBe(document.getElementById('test-div-3'));
+
+            DOM.removeListener(rootElem, 'click', listener);
         });
     });
 

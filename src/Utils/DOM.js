@@ -210,7 +210,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             sel = sel.trim().split(/\s*,\s*/g);
 
             sel.forEach(function (s) {
-                var m = s.match(/^#([^\s\[>+:\.]+)\s+\.([^\s\[>+:]+)$/);
+                var m = s.match(/^#([^\s\[>+:.]+)\s+\.([^\s\[>+:]+)$/);
 
                 if (m) {
                     elems.push.apply(elems, DOM.getByClassName(m[2], DOM.getById(m[1])));
@@ -554,6 +554,47 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
             return getElem(elem).dispatchEvent(event);
 
+        },
+
+        delegate: function(sel, handler) {
+            sel = sel
+                .trim()
+                .split(/\s*,\s*/g)
+                .map(function(s) {
+                    var m = s.match(/^(?:(?:#([^\s\[>+:.]+)\s+)?\.([^\s\[>+:]+)|#([^\s\[>+:.]+))$/);
+                    return [m[1] || m[3], m[2]];
+                });
+
+            return function(evt) {
+                if (!evt.target) {
+                    return;
+                }
+
+                var elems = [],
+                    ids = [],
+                    classes = [],
+                    found = [],
+                    elem = evt.target,
+                    i, j;
+
+                do {
+                    elems.push(elem);
+                    ids.push(elem.id);
+                    classes.push(elem.className ? elem.className.trim().split(/\s+/g) : []);
+                } while (elem = elem.parentNode);
+
+                for (i = 0; i < elems.length; i++) {
+                    for (j = 0; j < sel.length; j++) {
+                        if ((!sel[j][1] || classes[i].indexOf(sel[j][1]) > -1) && (!sel[j][0] || (!sel[j][1] ? ids[i] === sel[j][0] : ids.indexOf(sel[j][0]) > i))) {
+                            found.push(elems[i]);
+                        }
+                    }
+                }
+
+                for (i = 0; i < found.length; i++) {
+                    handler.call(found[i], evt, found[i]);
+                }
+            };
         },
 
         getData: function (elem, key, def) {
