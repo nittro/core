@@ -164,17 +164,13 @@ _context.invoke('Utils', function(Strings, undefined) {
     };
 
     Url.prototype.addParams = function(p) {
-        if (p instanceof Array && (p.length < 1 || 'name' in p[0])) {
-            for (var i = 0; i < p.length; i++) {
-                this._.params[p[i].name] = p[i].value;
+        if (Array.isArray(p) && (p.length && 'name' in p[0] && 'value' in p[0])) {
+            p = Url.parseQuery(Url.buildQuery(p, true));
+        }
 
-            }
-        } else {
-            for (var k in p) {
-                if (p[k] !== undefined) {
-                    this._.params[k] = p[k];
-
-                }
+        for (var k in p) {
+            if (p[k] !== undefined) {
+                this._.params[k] = p[k];
             }
         }
 
