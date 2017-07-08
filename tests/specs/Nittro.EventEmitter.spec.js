@@ -104,8 +104,10 @@ describe('Nittro.EventEmitter', function () {
             var data = { foo: 1, bar: 2, baz: 3 };
             testInstance.trigger('event3', data);
 
-            expect(listeners.data.calls.mostRecent()).toEqual({ object: testInstance, args: [ new NittroEvent(testInstance, 'event3', data) ], returnValue: undefined });
-
+            expect(listeners.data.calls.mostRecent()).toEqual(jasmine.objectContaining({
+                object: testInstance,
+                args: [ new NittroEvent(testInstance, 'event3', data) ]
+            }));
         });
     });
 
