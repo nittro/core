@@ -292,6 +292,28 @@ _context.invoke('Utils', function (Arrays, undefined) {
 
         },
 
+        remove: function (key, strict) {
+            var index = this._.keys.indexOf(key);
+
+            if (index > -1) {
+                this._.keys.splice(index, 1);
+                this._.values.slice(index, 1);
+                this.length--;
+
+                if (typeof key === 'number') {
+                    if (key + 1 === this._.nextNumeric) {
+                        this._.nextNumeric--;
+                    }
+                } else {
+                    this._.nonNumeric--;
+                }
+            } else if (strict) {
+                throw new RangeError('Key ' + key + ' not present in HashMap');
+            }
+
+            return this;
+        },
+
         forEach: function (callback, thisArg) {
             for (var i = 0; i < this.length; i++) {
                 callback.call(thisArg || null, this._.values[i], this._.keys[i], this);
