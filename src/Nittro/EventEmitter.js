@@ -64,7 +64,6 @@ _context.invoke('Nittro', function () {
     function add (emitter, evt, ns, dflt, handler, mode) {
         if (!evt) {
             throw new TypeError('No event specified');
-
         }
 
         if (dflt) {
@@ -170,7 +169,7 @@ _context.invoke('Nittro', function () {
         if (e.isAsync()) {
             e.then(function () {
                 triggerDefault(self, _, evt, e);
-            });
+            }, function() { /* no default handler on async reject */ });
         } else {
             triggerDefault(self, _, evt, e);
         }
@@ -222,50 +221,49 @@ _context.invoke('Nittro', function () {
         }
     };
 
-    function returnTrue() {
-        return true;
-    }
-
-    function returnFalse() {
-        return false;
-    }
-
     var NittroEvent = _context.extend(function (target, type, data) {
         this.target = target;
         this.type = type;
         this.data = data || {};
 
-        this._queue = null;
-        this._promise = null;
-
+        this._ = {
+            defaultPrevented: false,
+            async: false,
+            queue: null,
+            promise: null
+        };
     }, {
         preventDefault: function () {
-            this.isDefaultPrevented = returnTrue;
-
+            this._.defaultPrevented = true;
+            return this;
         },
 
-        isDefaultPrevented: returnFalse,
+        isDefaultPrevented: function () {
+            return this._.defaultPrevented;
+        },
 
         waitFor: function (promise) {
-            if (this._promise) {
+            if (this._.promise) {
                 throw new Error('The event\'s queue has already been frozen');
             }
 
-            this._queue || (this._queue = []);
-            this._queue.push(promise);
+            this._.queue || (this._.queue = []);
+            this._.queue.push(promise);
+            this._.async = true;
             return this;
         },
 
         isAsync: function () {
-            return !!this._queue;
+            return this._.async;
         },
 
         then: function (onfulfilled, onrejected) {
-            if (!this._promise) {
-                this._promise = this._queue ? Promise.all(this._queue) : Promise.resolve();
+            if (!this._.promise) {
+                this._.promise = this._.queue ? Promise.all(this._.queue) : Promise.resolve();
+                this._.queue = null;
             }
 
-            return this._promise.then(onfulfilled, onrejected);
+            return this._.promise.then(onfulfilled, onrejected);
         }
     });
 
