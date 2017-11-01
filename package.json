@@ -2,7 +2,7 @@
   "name": "nittro-core",
   "homepage": "https://www.nittro.org",
   "license": "MIT",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "author": "Dan Kadera <me@subsonic.cz>",
   "bugs": {
     "url": "https://github.com/nittro/core/issues",
