@@ -754,7 +754,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             return map([elem], function (elem) {
                 if (!elem.className) return elem;
 
-                elem.className = elem.className.replace(new RegExp('(?:^|\s+)(?:' + classes.join('|') + '(?:\s+|$)', 'g'), ' ').trim();
+                elem.className = elem.className.replace(new RegExp('(?:(?:^|\\s+)(?:' + classes.join('|') + '))+(?=\\s+|$)', 'g'), ' ').trim().replace(/\s\s+/g, ' ');
                 return elem;
 
             });
