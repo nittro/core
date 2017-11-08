@@ -711,7 +711,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
                 return map([elem], function (elem) {
                     classes.forEach(function (c) {
-                        if (value === undefined || value === elem.classList.contains(c)) {
+                        if (value === undefined || !value === elem.classList.contains(c)) {
                             elem.classList.toggle(c);
 
                         }
