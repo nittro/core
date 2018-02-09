@@ -151,8 +151,8 @@ var _context = (function() {
         for (i = 0, n = elems.length; i < n; i++) {
             elem = elems.item(i);
 
-            if (/^(application|text)\/javascript$/i.test(elem.type) && elem.hasAttribute('nonce')) {
-                return nonce = elem.getAttribute('nonce');
+            if (/^(application|text)\/javascript$/i.test(elem.type) && elem.nonce) {
+                return nonce = elem.nonce;
             }
         }
 
