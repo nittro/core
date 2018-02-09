@@ -14,6 +14,7 @@ var _context = (function() {
         promise = Promise,
         resolver = null,
         nsStack = [],
+        nonce = null,
         map = {
             names: [],
             classes: []
@@ -139,55 +140,68 @@ var _context = (function() {
         });
     }
 
+    function resolveNonce() {
+        if (nonce !== null) {
+            return nonce;
+        }
+
+        var elems = document.getElementsByTagName('script'),
+            i, n, elem;
+
+        for (i = 0, n = elems.length; i < n; i++) {
+            elem = elems.item(i);
+
+            if (/^(application|text)\/javascript$/i.test(elem.type) && elem.hasAttribute('nonce')) {
+                return nonce = elem.getAttribute('nonce');
+            }
+        }
+
+        return nonce = false;
+    }
+
     function exec(s, t, u) {
-        var e;
+        var e, o = resolveNonce();
 
         if (!t) {
             if (u.match(/\.(?:less|css)/i)) {
                 t = 'text/css';
-
             } else  {
-                t = 'text/javascript';
-
+                t = 'application/javascript';
             }
         } else {
             t = t.replace(/\s*;.*$/, '').toLowerCase();
-
         }
 
         if (t === 'text/css') {
             e = elem('style');
             e.type = t;
+            o && e.setAttribute('nonce', o);
 
             u = u.replace(/[^\/]+$/, '');
-            s = s.replace(/url\s*\(('|")?(?:\.\/)?(.+?)\1\)/, function (m, q, n) {
+            s = s.replace(/url\s*\((['"])?(?:\.\/)?(.+?)\1\)/, function (m, q, n) {
                 q || (q = '"');
 
                 if (n.match(/^(?:(?:https?:)?\/)?\//)) {
                     return 'url(' + q + n + q + ')';
-
                 } else {
                     return 'url(' + q + resolveUrl(u + n) + q + ')';
-
                 }
             });
 
             if (e.styleSheet) {
                 e.styleSheet.cssText = s;
-
             } else {
                 e.appendChild(doc.createTextNode(s));
-
             }
 
             doc.head.appendChild(e);
 
         } else {
             e = elem('script');
-            e.type = 'text/javascript';
+            e.type = t;
             e.text = s;
+            o && e.setAttribute('nonce', o);
             doc.head.appendChild(e).parentNode.removeChild(e);
-
         }
     }
 
@@ -447,7 +461,7 @@ var _context = (function() {
 
         if (source.hasOwnProperty('STATIC') && source.STATIC) {
             merge(target, source.STATIC);
-            
+
         }
 
         copyProps(target.prototype, source, map);
