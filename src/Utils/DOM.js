@@ -182,7 +182,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         thead: 'table',
         tbody: 'table',
         tfoot: 'table',
-        tr: 'table',
+        tr: 'tbody',
         th: 'tr',
         td: 'tr',
         li: 'ul',
