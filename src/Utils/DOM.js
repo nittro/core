@@ -46,7 +46,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
     function getPrefixed(elem, prop) {
         elem = getElem(elem);
 
-        if (prop in elem.style) {
+        if (!elem || prop in elem.style) {
             return prop;
 
         }
