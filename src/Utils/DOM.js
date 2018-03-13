@@ -460,6 +460,18 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             });
         },
 
+        text: function (str) {
+            if (arguments.length > 1) {
+                if (Array.isArray(arguments[1])) {
+                    str = Strings.vsprintf(str, arguments[1]);
+                } else {
+                    str = Arrays.createFrom(arguments).join(' ');
+                }
+            }
+
+            return document.createTextNode(str);
+        },
+
         empty: function(elem) {
             return map(arguments, function (elem) {
                 while (elem.firstChild) {
