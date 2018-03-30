@@ -3,31 +3,72 @@ _context.invoke('Utils', function(Strings, undefined) {
     var location = window.history.location || window.location; // support for HTML5 history polyfill
 
     var Url = function(s) {
-        var cur = location.href.match(Url.PARSER_REGEXP),
-			src = s === null || s === '' || s === undefined ? cur : s.match(Url.PARSER_REGEXP),
-            noHost = !src[4],
-            path = src[6] || '';
+        if (s === null || s === '' || s === undefined) {
+            this._ = {
+                protocol: location.protocol,
+                hostname: location.hostname,
+                port: location.port,
+                path: location.pathname,
+                params: Url.parseQuery(location.search),
+                hash: location.hash
+            };
 
-        if (noHost && path.charAt(0) !== '/') {
-            if (path.length) {
-                path = Url.getDirName(cur[6] || '') + '/' + path.replace(/^\.\//, '');
+            extractAuthInfo(location.href, this._);
+        } else {
+            s += '';
 
+            var proto = Url.RE_PROTOCOL.exec(s),
+                auth,
+                i;
+
+            this._ = {
+                protocol: proto ? proto[1] || location.protocol : location.protocol
+            };
+
+            if (proto) {
+                if (proto[2] && proto[3] || proto[4]) {
+                    s = s.substr(proto[0].length);
+                    auth = Url.RE_AUTHORITY.exec(s) || [''];
+                    s = s.substr(auth[0].length);
+                    this._.username = auth[1] || '';
+                    this._.password = auth[2] || '';
+                    this._.hostname = auth[3] || '';
+                    this._.port = auth[4] || '';
+                } else {
+                    this._.username
+                        = this._.password
+                        = this._.hostname
+                        = this._.port
+                        = this._.path
+                        = this._.hash
+                        = '';
+
+                    this._.params = {};
+                    return;
+                }
             } else {
-                path = cur[6];
-
+                this._.username = '';
+                this._.password = '';
+                this._.hostname = location.hostname;
+                this._.port = location.port;
             }
-        }
 
-        this._ = {
-            protocol: src[1] || cur[1] || '',
-            username: (noHost ? src[2] || cur[2] : src[2]) || '',
-            password: (noHost ? src[3] || cur[3] : src[3]) || '',
-            hostname: src[4] || cur[4] || '',
-            port: (noHost ? src[5] || cur[5] : src[5]) || '',
-            path: path,
-            params: Url.parseQuery((noHost && !src[6] ? src[7] || cur[7] : src[7]) || ''),
-            hash: (noHost && !src[6] && !src[7] ? src[8] || cur[8] : src[8]) || ''
-        };
+            if ((i = s.indexOf('#')) > -1) {
+                this._.hash = s.substr(i);
+                s = s.substr(0, i);
+            } else {
+                this._.hash = '';
+            }
+
+            if ((i = s.indexOf('?')) > -1) {
+                this._.params = Url.parseQuery(s.substr(i + 1));
+                s = s.substr(0, i);
+            } else {
+                this._.params = {};
+            }
+
+            this._.path = s;
+        }
     };
 
     Url.prototype.getProtocol = function() {
@@ -272,18 +313,9 @@ _context.invoke('Utils', function(Strings, undefined) {
 
     };
 
-    /**
-     * 1: protocol
-     * 2: user
-     * 3: pass
-     * 4: host
-     * 5: port
-     * 6: path
-     * 7: query
-     * 8: hash
-     * @type {RegExp}
-     */
-    Url.PARSER_REGEXP = /^(?:([^:/]+:)?\/\/(?:([^\/@]+?)(?::([^\/@]+))?@)?(?:([^/]+?)(?::(\d+))?(?=\/|$))?)?(.*?)(\?.*?)?(#.*)?$/;
+    Url.RE_PROTOCOL = /^((?:(https?)|[a-z][a-z0-9.+-]*):)(\/\/)?|^(\/\/)/i;
+    Url.RE_AUTHORITY = /^(?:([^@:]+?)(?::([^@]+))?@)?([^:\/]+)(?::(\d+))?/;
+
     Url.PART = {
         PROTOCOL: 128,
         USERNAME: 64,
@@ -296,13 +328,11 @@ _context.invoke('Utils', function(Strings, undefined) {
     };
 
     Url.from = function(s) {
-        return s instanceof Url ? new Url(s.toAbsolute()) : new Url(typeof s === 'string' || s === null || s === undefined ? s : Strings.toString(s));
-
+        return s instanceof Url ? new Url(s.toAbsolute()) : new Url(s);
     };
 
     Url.fromCurrent = function() {
         return new Url();
-
     };
 
     Url.getDirName = function (path) {
@@ -493,6 +523,21 @@ _context.invoke('Utils', function(Strings, undefined) {
         return p;
 
     };
+
+
+    function extractAuthInfo(url, onto) {
+        url = url.replace(Url.RE_PROTOCOL, '');
+
+        var tmp = url.indexOf('@');
+
+        if (tmp > -1) {
+            tmp = url.substr(0, tmp).split(':', 2);
+            onto.username = tmp[0];
+            onto.password = tmp[1] || '';
+        } else {
+            onto.username = onto.password = '';
+        }
+    }
 
     _context.register(Url, 'Url');
 

@@ -292,6 +292,7 @@ describe('Utils.Url', function () {
             expect(testUrl.compare('http://joe:doedoe@yourhost.com:80/some/other/file.xml?item1=2&item3=0#info')).toBe(Url.PART.USERNAME);
             expect(testUrl.compare('https://john:doedoe@yourhost.com:80/some/other/file.xml?item1=2&item3=0#info')).toBe(Url.PART.PROTOCOL);
             expect(testUrl.compare('http://joe:doedoe@yourhost.com:440/some/other/file.xml?item1=5&item3=0#info')).toBe(Url.PART.USERNAME | Url.PART.PORT | Url.PART.QUERY);
+            expect(testUrl.compare('javascript:alert("h4cked");')).not.toBeLessThan(Url.PART.PROTOCOL);
         });
     });
 
@@ -301,6 +302,9 @@ describe('Utils.Url', function () {
             expect(Url.from('//api.facebook.com/sdk.js').toAbsolute()).toBe(document.location.protocol + '//api.facebook.com/sdk.js');
             expect(Url.from(testUrl)).not.toBe(testUrl);
             expect(Url.from(testUrl).toAbsolute()).toBe(testUrl.toAbsolute());
+            expect(Url.from('about:blank').toAbsolute()).toBe('about://');
+            expect(Url.from('javascript:alert("h4cked");').toAbsolute()).toBe('javascript://');
+            expect(Url.from('tel:+1-234-567890').toAbsolute()).toBe('tel://');
         });
     });
 
