@@ -67,7 +67,7 @@ _context.invoke('Utils', function(Strings, undefined) {
                 this._.params = {};
             }
 
-            this._.path = s;
+            this._.path = s || '/';
         }
     };
 
