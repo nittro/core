@@ -298,7 +298,7 @@ describe('Utils.Url', function () {
 
     describe('from()', function () {
         it('should return a new Url instance derived from the specified argument', function () {
-            expect(Url.from('http://google.com').toAbsolute()).toBe('http://google.com');
+            expect(Url.from('http://google.com').toAbsolute()).toBe('http://google.com/');
             expect(Url.from('//api.facebook.com/sdk.js').toAbsolute()).toBe(document.location.protocol + '//api.facebook.com/sdk.js');
             expect(Url.from(testUrl)).not.toBe(testUrl);
             expect(Url.from(testUrl).toAbsolute()).toBe(testUrl.toAbsolute());
