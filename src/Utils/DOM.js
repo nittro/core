@@ -548,9 +548,14 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         trigger: function (elem, evt, params) {
+            var domElement = getElem(elem);
+            if (domElement === null) {
+                return;
+            }
+            
             var module = knownEvents[evt] || 'CustomEvent',
                 event;
-
+            
             params || (params = {});
             'bubbles' in params || (params.bubbles = true);
             'cancelable' in params || (params.cancelable = true);
@@ -564,7 +569,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
             }
 
-            return getElem(elem).dispatchEvent(event);
+            return domElement.dispatchEvent(event);
 
         },
 
