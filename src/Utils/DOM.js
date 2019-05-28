@@ -548,8 +548,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         trigger: function (elem, evt, params) {
-            var domElement = getElem(elem);
-            if (domElement === null) {
+            if (!(elem = getElem(elem))) {
                 return;
             }
             
@@ -562,15 +561,12 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
 
             try {
                 event = knownEventModules[module].create(evt, params);
-
             } catch (e) {
                 event = document.createEvent(knownEventModules[module].name || module);
                 knownEventModules[module].init(event, evt, params);
-
             }
 
-            return domElement.dispatchEvent(event);
-
+            return elem.dispatchEvent(event);
         },
 
         delegate: function(sel, handler) {
