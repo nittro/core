@@ -548,24 +548,25 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
         },
 
         trigger: function (elem, evt, params) {
+            if (!(elem = getElem(elem))) {
+                return;
+            }
+            
             var module = knownEvents[evt] || 'CustomEvent',
                 event;
-
+            
             params || (params = {});
             'bubbles' in params || (params.bubbles = true);
             'cancelable' in params || (params.cancelable = true);
 
             try {
                 event = knownEventModules[module].create(evt, params);
-
             } catch (e) {
                 event = document.createEvent(knownEventModules[module].name || module);
                 knownEventModules[module].init(event, evt, params);
-
             }
 
-            return getElem(elem).dispatchEvent(event);
-
+            return elem.dispatchEvent(event);
         },
 
         delegate: function(sel, handler) {
