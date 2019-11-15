@@ -551,10 +551,10 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             if (!(elem = getElem(elem))) {
                 return;
             }
-            
+
             var module = knownEvents[evt] || 'CustomEvent',
                 event;
-            
+
             params || (params = {});
             'bubbles' in params || (params.bubbles = true);
             'cancelable' in params || (params.cancelable = true);
@@ -741,7 +741,7 @@ _context.invoke('Utils', function (Arrays, Strings, undefined) {
             classes = prepare(arguments);
 
             for (var i = 0; i < classes.length; i++) {
-                if (!elem.classList.contains(classes[i])) {
+                if (!elem.classList || !elem.classList.contains(classes[i])) {
                     return false;
 
                 }
